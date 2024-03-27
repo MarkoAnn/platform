@@ -75,11 +75,21 @@ public:
         return y2; // Возвращаем Y-координату нижней части препятствия
     }
 };
+// Функция для проверки пересечения двух прямоугольников
+bool isRectangleIntersecting(int x1, int y1, int width1, int height1,
+    int x2, int y2, int width2, int height2) {
+    // Проверяем, что прямоугольники не пересекаются
+    if (x1 > x2 + width2 || x2 > x1 + width1 ||
+        y1 > y2 + height2 || y2 > y1 + height1) {
+        return false;
+    }
+    return true;
+}
 
 int main() {
     initwindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    Player player(100, 50, 30); // Создаем игрока в центре экрана над препятствием
+    Player player(200, 50, 30); // Создаем игрока в центре экрана над препятствием
     Obstacle obstacle(150, 300, 300, 300); // Создаем препятствие (линию) между (150, 300) и (300, 300)
 
     while (!kbhit()) { // Цикл будет выполняться, пока не нажата клавиша
@@ -89,10 +99,12 @@ int main() {
         player.draw();
         obstacle.draw();
 
-        // Проверяем, если нижняя граница игрока находится выше верхней границы препятствия и верхняя граница игрока ниже нижней границы препятствия, то игрок падает
-        if (player.getY() + player.getSize() < obstacle.getTopY() || player.getY() + player.getSize() < WINDOW_HEIGHT) {
+        // Проверяем, если препятствие под игроком, то игрок падает
+        if (!isRectangleIntersecting(player.getX() - player.getSize() / 2, player.getY() - player.getSize() / 2, player.getSize(), player.getSize(),
+            obstacle.getX1(), obstacle.getTopY(), obstacle.getX2() - obstacle.getX1(), obstacle.getBottomY() - obstacle.getTopY())) {
             player.fall();
         }
+
         delay(50); // Задержка для плавного движения
 
         // Обновляем экран
