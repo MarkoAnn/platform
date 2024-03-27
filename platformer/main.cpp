@@ -2,9 +2,9 @@
 #include <vector>
 #include "graphics.h"
 #pragma comment(lib,"graphics.lib")
-
 const int WINDOW_WIDTH = 500;
 const int WINDOW_HEIGHT = 500;
+const int PLAYER_SPEED = 5; // Скорость движения игрока
 
 class Player {
 private:
@@ -31,7 +31,15 @@ public:
     }
 
     void fall() {
-        y += 5; // Увеличиваем координату Y, чтобы игрок падал
+        y += PLAYER_SPEED; // Увеличиваем координату Y, чтобы игрок падал
+    }
+
+    void moveLeft() {
+        x -= PLAYER_SPEED; // Уменьшаем координату X, чтобы игрок двигался влево
+    }
+
+    void moveRight() {
+        x += PLAYER_SPEED; // Увеличиваем координату X, чтобы игрок двигался вправо
     }
 
     int getX() const {
@@ -46,6 +54,7 @@ public:
         return size;
     }
 };
+
 class Obstacle {
 private:
     int x1, y1; // Координаты начала препятствия
@@ -67,28 +76,69 @@ public:
         return x2;
     }
 
-    int getY() const {
-        return y1; // Оба конца линии имеют одну и ту же координату Y
+    int getTopY() const {
+        return y1; // Возвращаем Y-координату верхней части препятствия
+    }
+
+    int getBottomY() const {
+        return y2; // Возвращаем Y-координату нижней части препятствия
     }
 };
 
+// Функция для проверки пересечения двух прямоугольников
+bool isRectangleIntersecting(int x1, int y1, int width1, int height1,
+    int x2, int y2, int width2, int height2) {
+    // Проверяем, что прямоугольники не пересекаются
+    if (x1 > x2 + width2 || x2 > x1 + width1 ||
+        y1 > y2 + height2 || y2 > y1 + height1) {
+        return false;
+    }
+    return true;
+}
+
+// Функция для перемещения игрока в зависимости от переданного направления
+void move(char currentDirection, Player& player) {
+    switch (currentDirection) {
+    case 'a':
+        player.moveLeft();
+        break;
+    case 'd':
+        player.moveRight();
+        break;
+        // Добавляем другие направления движения, если нужно
+    }
+}
 int main() {
     initwindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    Player player(200, 50, 30); // Создаем игрока с координатами (200, 50) и размером 30
-    Obstacle obstacle(150, 300, 300, 300);
-    while (!kbhit()) { // Цикл будет выполняться, пока не нажата клавиша
+    Player player(200, 50, 30); // Создаем игрока в центре экрана над препятствием
+    Obstacle obstacle(150, 300, 300, 300); // Создаем препятствие (линию) между (150, 300) и (300, 300)
+
+    while (true) { // Цикл будет выполняться, пока не нажата клавиша
         cleardevice(); // Очищаем экран
 
-        // Рисуем игрока
+        // Рисуем игрока и препятствие
         player.draw();
         obstacle.draw();
 
-        // Проверяем, если игрок не находится на препятствии, то падаем
-        if (player.getY() + player.getSize() < obstacle.getY()) {
+        // Проверяем, если препятствие под игроком, то игрок падает
+        if (!isRectangleIntersecting(player.getX() - player.getSize() / 2, player.getY() - player.getSize() / 2, player.getSize(), player.getSize(),
+            obstacle.getX1(), obstacle.getTopY(), obstacle.getX2() - obstacle.getX1(), obstacle.getBottomY() - obstacle.getTopY())) {
             player.fall();
         }
 
+        // Проверяем нажатие клавиш
+        if (kbhit()) {
+            char key = getch(); // Получаем код клавиши
+            std::cout << "Pressed key: " << static_cast<int>(key) << std::endl; // Вывод нажатой клавиши
+
+            // Выход из цикла, если нажата клавиша выхода (Esc)
+            if (key == 27)
+                break;
+
+            // Вызываем функцию для перемещения игрока
+            move(key, player);
+        }
 
         delay(50); // Задержка для плавного движения
 
