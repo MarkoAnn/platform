@@ -12,7 +12,7 @@ class Player {
 private:
     int x, y; // Координаты игрока
     int size; // Размер игрока
-    float vertical_velocity;
+   
     int yVelocity;
 public:
     Player(int startX, int startY, int playerSize) : x(startX), y(startY), size(playerSize), yVelocity(0) {}
@@ -49,7 +49,7 @@ public:
     }
     void setGrounded(bool grounded) {
         if (grounded)
-            vertical_velocity = 0; // Обнуляем вертикальную скорость при приземлении
+            yVelocity = 0; // Обнуляем вертикальную скорость при приземлении
         isGrounded = grounded;
     }
 
