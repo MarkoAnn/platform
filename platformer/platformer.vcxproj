@@ -130,6 +130,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Classes.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="winbgim.h" />
   </ItemGroup>

@@ -26,6 +26,9 @@
     <ClInclude Include="winbgim.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="Classes.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="graphics.lib">
