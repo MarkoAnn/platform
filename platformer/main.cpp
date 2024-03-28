@@ -36,7 +36,9 @@ void move(char currentDirection, Player& player) {
     case 'd':
         player.moveRight();
         break;
-        // Добавляем другие направления движения, если нужно
+    case 32: // Код клавиши прыжка
+        player.jump();
+        break;
     }
 }
 int main() {
@@ -47,10 +49,10 @@ int main() {
 
     while (true) { // Цикл будет выполняться, пока не нажата клавиша
         cleardevice(); // Очищаем экран
-
         // Рисуем игрока и препятствие
         player.draw();
         obstacle.draw(); // Отрисовываем препятствие
+       
         bool isGrounded = (player.getY() >= obstacle.getTopY() - player.getSize() / 2);
         if (isPlayerOnObstacle(player, obstacle)) {
             player.fall(obstacle.getTopY()); // Пересчитываем скорость падения, если игрок на препятствии
@@ -58,16 +60,15 @@ int main() {
         else {
             player.fall(WINDOW_HEIGHT); // Иначе просто падаем вниз
         }
-
-      
-
-        // Если игрок не на препятствии, он должен падать
-        if (!isGrounded) {
-            player.fall(obstacle.getTopY()); // Обновляем позицию игрока
-        }
-        // Проверяем нажатие клавиш
+        
+    // Проверяем нажатие клавиш
         if (kbhit()) {
-            char key = getch(); // Получаем код клавиши
+            char key = getch(); // Получаем код нажатой клавиши
+
+         
+            if (key == 32) { 
+                player.jump(); // Вызываем метод прыжка для игрока
+            }
             std::cout << "Pressed key: " << static_cast<int>(key) << std::endl; // Вывод нажатой клавиши
 
             // Выход из цикла, если нажата клавиша выхода (Esc)
@@ -77,16 +78,11 @@ int main() {
             // Вызываем функцию для перемещения игрока
             move(key, player);
         }
-    
-
-        // Обновляем экран
-        player.draw();
-        obstacle.draw(); // Отрисовываем препятствие
-
-        delay(50); // Задержка для плавного движения
-
+   
         // Обновляем экран
         swapbuffers();
+
+        delay(50); // Задержка для плавного движения
     }
 
     closegraph();
