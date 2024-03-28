@@ -9,15 +9,22 @@ const int PLAYER_SPEED = 5; // Скорость движения игрока
 bool isGrounded = false; // Флаг, указывающий, приземлен ли игрок*/
 
 
-// Функция для проверки пересечения двух прямоугольников
-bool isRectangleIntersecting(int x1, int y1, int width1, int height1,
-    int x2, int y2, int width2, int height2) {
-    // Проверяем пересечение двух прямоугольников
-    if (x1 > x2 + width2 || x2 > x1 + width1 ||
-        y1 > y2 + height2 || y2 > y1 + height1) {
-        return false;
-    }
-    return true;
+bool isPlayerOnObstacle(const Player& player, const Obstacle& obstacle) {
+    int playerTop = player.getY() - player.getSize() / 2;
+    int playerBottom = player.getY() + player.getSize() / 2;
+    int playerLeft = player.getX() - player.getSize() / 2;
+    int playerRight = player.getX() + player.getSize() / 2;
+
+    int obstacleTop = obstacle.getTopY();
+    int obstacleBottom = obstacle.getBottomY();
+    int obstacleLeft = obstacle.getX1();
+    int obstacleRight = obstacle.getX2();
+
+    // Проверяем пересечение по горизонтали и вертикали
+    bool horizontalOverlap = playerRight >= obstacleLeft && playerLeft <= obstacleRight;
+    bool verticalOverlap = playerBottom >= obstacleTop && playerTop <= obstacleBottom;
+
+    return horizontalOverlap && verticalOverlap;
 }
 
 // Функция для перемещения игрока в зависимости от переданного направления
@@ -35,7 +42,7 @@ void move(char currentDirection, Player& player) {
 int main() {
     initwindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    Player player(200, 50, 30); // Создаем игрока в центре экрана над препятствием
+    Player player(200, 50, 30); // Создаем игрока в центре экрана
     Obstacle obstacle(150, 300, 300, 300); // Создаем препятствие (линию) между (150, 300) и (300, 300)
 
     while (true) { // Цикл будет выполняться, пока не нажата клавиша
@@ -43,30 +50,26 @@ int main() {
 
         // Рисуем игрока и препятствие
         player.draw();
-        obstacle.draw();
-
-        // Проверяем столкновение с землей
-        if (!isGrounded) {
-            player.fall(obstacle.getTopY());
-
+        obstacle.draw(); // Отрисовываем препятствие
+        bool isGrounded = (player.getY() >= obstacle.getTopY() - player.getSize() / 2);
+        if (isPlayerOnObstacle(player, obstacle)) {
+            player.fall(obstacle.getTopY()); // Пересчитываем скорость падения, если игрок на препятствии
         }
-        // Проверяем столкновение с препятствием
-        if (isRectangleIntersecting(player.getX() - player.getSize() / 2, player.getY() + player.getSize() / 2, player.getSize(), 1,
-            obstacle.getX1(), obstacle.getTopY(), obstacle.getX2() - obstacle.getX1(), 1))
-            player.setGrounded(true);
+        else {
+            player.fall(WINDOW_HEIGHT); // Иначе просто падаем вниз
+        }
 
-        // Если игрок на земле, он должен падать
-        if (!isGrounded)
-            player.fall(obstacle.getTopY());
+      
 
-
+        // Если игрок не на препятствии, он должен падать
+        if (!isGrounded) {
+            player.fall(obstacle.getTopY()); // Обновляем позицию игрока
+        }
         // Проверяем нажатие клавиш
         if (kbhit()) {
             char key = getch(); // Получаем код клавиши
             std::cout << "Pressed key: " << static_cast<int>(key) << std::endl; // Вывод нажатой клавиши
-            if (key == ' ') {
-                player.jump();
-            }
+
             // Выход из цикла, если нажата клавиша выхода (Esc)
             if (key == 27)
                 break;
@@ -74,6 +77,11 @@ int main() {
             // Вызываем функцию для перемещения игрока
             move(key, player);
         }
+    
+
+        // Обновляем экран
+        player.draw();
+        obstacle.draw(); // Отрисовываем препятствие
 
         delay(50); // Задержка для плавного движения
 
@@ -84,4 +92,3 @@ int main() {
     closegraph();
     return 0;
 }
-
