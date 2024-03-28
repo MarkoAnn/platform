@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="Classes.h" />
     <ClInclude Include="graphics.h" />
+    <ClInclude Include="main.h" />
     <ClInclude Include="winbgim.h" />
   </ItemGroup>
   <ItemGroup>
