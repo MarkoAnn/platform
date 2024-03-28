@@ -29,7 +29,7 @@ void move(char currentDirection, Player& player) {
     case 'd':
         player.moveRight();
         break;
-        // ƒобавл€ем другие направлени€ движени€, если нужно
+        
     }
 }
 int main() {
