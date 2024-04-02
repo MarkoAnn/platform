@@ -78,6 +78,7 @@ void mainLoop(Player& player, Obstacle& obstacle)
         if (player.IsOnCollider(obstacle)) {
             std::cout << "onground" << std::endl;
             player.setGrounded(true);
+
             player.setVelocityY(0);
             player.setVelocityX(0);
         }
