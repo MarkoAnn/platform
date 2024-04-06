@@ -70,14 +70,15 @@ void mainLoop(Player& player, Obstacle& obstacle)
 
 
         // ensure player does not fall through the obstacle
-        if (isPlayerInObstacle(player, obstacle)) {
+        if (player.IsOverlapping(obstacle)) {
             std::cout << "IN ground" << std::endl;
             player.setBottomOn(obstacle.getTopY());
         }
         // check if player is on the floor
-        if (isPlayerOnObstacle(player, obstacle)) {
+        if (player.IsOnCollider(obstacle)) {
             std::cout << "onground" << std::endl;
             player.setGrounded(true);
+
             player.setVelocityY(0);
             player.setVelocityX(0);
         }
